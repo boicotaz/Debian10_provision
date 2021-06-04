@@ -12,15 +12,15 @@
         name:
         - apt-transport-https
         - ca-certificates
-        - curl 
+        - curl
         - gnupg2
         - software-properties-common
-        - python3-pip  
-        - python3-setuptools  
-        state: latest     
+        - python3-pip
+        - python3-setuptools
+        state: latest
 
-    - name: add Docker GPG apt key 
-      apt_key: 
+    - name: add Docker GPG apt key
+      apt_key:
         url: https://download.docker.com/linux/debian/gpg
         state: present
 
@@ -30,9 +30,9 @@
         state: present
 
     - name: Update apt and install docker-ce
-      apt: 
-        update_cache: yes 
-        name: docker-ce 
+      apt:
+        update_cache: yes
+        name: docker-ce
         state: latest
 
     - name: Install Docker Module for Python
@@ -47,5 +47,5 @@
         ports:
           - "3306:3306"
           - "33060:33060"
-          - "33061:33061"  
+          - "33061:33061"
         command: ["mysqld"]

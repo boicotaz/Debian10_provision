@@ -8,26 +8,26 @@
         name: "*"
         state: latest
 
-    - name: Install Nginx related packages 
+    - name: Install Nginx related packages
       apt:
-        name: 
+        name:
         - nginx
         - php
         - php-fpm
-        - snapd  
+        - snapd
         state: latest
-     
+
     - name: Enable Nginx service on startup
-      systemd: 
+      systemd:
         name: nginx
         enabled: yes
         masked: no
 
     - name: update Nginx configuration
       copy:
-        src: ../files/default   
+        src: ../files/default
         dest: /etc/nginx/sites-available/default
-          
+
     - name: deploy index.php
       copy:
         src: ../files/index.php
@@ -35,14 +35,14 @@
         owner: root
         group: root
         mode: '0744'
-      notify: 
-        - Restart Nginx 
-        - Restart PHP-FPM   
-        
+      notify:
+        - Restart Nginx
+        - Restart PHP-FPM
+
     - name: Install core
-      command: 
+      command:
         cmd: snap install core
-    
+
     - name: Refresh core
       command:
         cmd: snap refresh core
@@ -64,13 +64,13 @@
       changed_when: "'deployed certificate' in generate_cert_result.stdout"
       notify: Restart Nginx
 
-  handlers:        
-    - name: Restart Nginx 
+  handlers:
+    - name: Restart Nginx
       service:
         name:  nginx
         state: restarted
 
     - name: Restart PHP-FPM
-      service: 
-        name: php7.3-fpm  
-        state: restarted       
+      service:
+        name: php7.3-fpm
+        state: restarted
