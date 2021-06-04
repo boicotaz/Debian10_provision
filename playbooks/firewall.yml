@@ -1,0 +1,23 @@
+---
+- name: Configure Firewall
+  hosts: remote_server
+  tasks:
+    - name: Install ufw
+      apt:
+        name: ufw
+        state: latest
+
+    - name: Set up firewall rules & enable ufw 
+      ufw:
+        rule: allow
+        src: '{{ item.address }}'
+        port: '{{ item.port }}'
+        proto: tcp
+        state: enabled 
+      loop:
+        - { address: 213.249.8.53, port: http }
+        - { address: 213.249.8.53, port: https }
+        - { address: 213.249.8.53, port: ssh }
+        - { address: 94.65.233.250, port: ssh }
+        - { address: 94.65.233.250, port: http }
+        - { address: 94.65.233.250, port: https }

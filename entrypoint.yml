@@ -1,0 +1,16 @@
+---
+- hosts: remote_server   
+  tasks: 
+    - name: Update all packages to their latest version
+      apt:
+        name: "*"
+        state: latest
+
+- name: import nginx configuration playbook
+  import_playbook: playbooks/nginx.yml  
+
+- name: Import docker configuration playbook 
+  import_playbook: playbooks/docker.yml
+
+- name: Import firewall configuration playbook
+  import_playbook: playbooks/firewall.yml

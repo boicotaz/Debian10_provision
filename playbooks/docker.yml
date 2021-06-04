@@ -1,0 +1,51 @@
+---
+- name: Install Docker & Create Container for mysql-server-8
+  hosts: remote_server
+  tasks:
+    - name: Update all packages to their latest version
+      apt:
+        name: "*"
+        state: latest
+
+    - name: Install packages
+      apt:
+        name:
+        - apt-transport-https
+        - ca-certificates
+        - curl 
+        - gnupg2
+        - software-properties-common
+        - python3-pip  
+        - python3-setuptools  
+        state: latest     
+
+    - name: add Docker GPG apt key 
+      apt_key: 
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb [arch=amd64]  https://download.docker.com/linux/debian buster stable
+        state: present
+
+    - name: Update apt and install docker-ce
+      apt: 
+        update_cache: yes 
+        name: docker-ce 
+        state: latest
+
+    - name: Install Docker Module for Python
+      pip:
+        name: docker
+
+    - name: Create Mysql Server container
+      docker_container:
+        name: mysql-server
+        image: mysql/mysql-server:8.0
+        memory: 2g
+        ports:
+          - "3306:3306"
+          - "33060:33060"
+          - "33061:33061"  
+        command: ["mysqld"]

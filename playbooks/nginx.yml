@@ -1,0 +1,76 @@
+---
+- name: Configure Nginx
+  hosts: remote_server
+  tasks:
+
+    - name: Update all packages to their latest version
+      apt:
+        name: "*"
+        state: latest
+
+    - name: Install Nginx related packages 
+      apt:
+        name: 
+        - nginx
+        - php
+        - php-fpm
+        - snapd  
+        state: latest
+     
+    - name: Enable Nginx service on startup
+      systemd: 
+        name: nginx
+        enabled: yes
+        masked: no
+
+    - name: update Nginx configuration
+      copy:
+        src: ../files/default   
+        dest: /etc/nginx/sites-available/default
+          
+    - name: deploy index.php
+      copy:
+        src: ../files/index.php
+        dest: /var/www/html
+        owner: root
+        group: root
+        mode: '0744'
+      notify: 
+        - Restart Nginx 
+        - Restart PHP-FPM   
+        
+    - name: Install core
+      command: 
+        cmd: snap install core
+    
+    - name: Refresh core
+      command:
+        cmd: snap refresh core
+
+    - name: install certbot
+      command:
+        cmd: snap install --classic certbot
+
+    - name: create symlinks
+      file:
+        src: /snap/bin/certbot
+        dest: /usr/bin/certbot
+        state: link
+
+    - name: generate certificate
+      command:
+        cmd: certbot --nginx --register-unsafely-without-email --non-interactive --agree-tos -d sandbox-playground.dev.hc.generation-y.net 
+      register: generate_cert_result
+      changed_when: "'deployed certificate' in generate_cert_result.stdout"
+      notify: Restart Nginx
+
+  handlers:        
+    - name: Restart Nginx 
+      service:
+        name:  nginx
+        state: restarted
+
+    - name: Restart PHP-FPM
+      service: 
+        name: php7.3-fpm  
+        state: restarted       
